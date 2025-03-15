@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// New custom colors for Deep Learning Lab
+				lab: {
+					primary: '#2563EB',
+					secondary: '#1E40AF',
+					accent: '#60A5FA',
+					background: '#F8FAFC',
+					card: '#FFFFFF',
+					text: '#1E293B',
+					muted: '#94A3B8',
+					border: '#E2E8F0',
 				}
 			},
 			borderRadius: {
@@ -84,11 +96,66 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'fade-out': {
+					from: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					},
+					to: {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					}
+				},
+				'slide-in': {
+					from: {
+						transform: 'translateX(30px)',
+						opacity: '0'
+					},
+					to: {
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
+				'slide-out': {
+					from: {
+						transform: 'translateX(0)',
+						opacity: '1'
+					},
+					to: {
+						transform: 'translateX(30px)',
+						opacity: '0'
+					}
+				},
+				'blur-in': {
+					from: {
+						filter: 'blur(8px)',
+						opacity: '0'
+					},
+					to: {
+						filter: 'blur(0)',
+						opacity: '1'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.4s ease-out',
+				'fade-out': 'fade-out 0.4s ease-out',
+				'slide-in': 'slide-in 0.4s ease-out',
+				'slide-out': 'slide-out 0.4s ease-out',
+				'blur-in': 'blur-in 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
 			}
 		}
 	},
