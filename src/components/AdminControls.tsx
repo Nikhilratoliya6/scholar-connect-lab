@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { ContentItem } from "./ContentCard";
-import { useAuth } from "@/context/AuthContext";
+import { useSupabaseAuth } from "@/context/SupabaseAuthContext";
 
 interface AdminControlsProps {
   contentType: ContentItem["type"];
@@ -17,7 +17,7 @@ interface AdminControlsProps {
 
 const AdminControls: React.FC<AdminControlsProps> = ({ contentType, onAddContent }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { currentUser } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   
   const [newContent, setNewContent] = useState<Omit<ContentItem, "id">>({
     title: "",
@@ -25,8 +25,8 @@ const AdminControls: React.FC<AdminControlsProps> = ({ contentType, onAddContent
     type: contentType,
     content: "",
     date: new Date().toISOString(),
-    authorId: currentUser?.id || "",
-    authorName: currentUser?.name || "",
+    authorId: user?.id || "",
+    authorName: profile?.full_name || user?.email?.split('@')[0] || "Admin",
   });
 
   const handleAddContent = () => {
@@ -38,8 +38,8 @@ const AdminControls: React.FC<AdminControlsProps> = ({ contentType, onAddContent
     onAddContent({
       ...newContent,
       date: new Date().toISOString(),
-      authorId: currentUser?.id || "",
-      authorName: currentUser?.name || "",
+      authorId: user?.id || "",
+      authorName: profile?.full_name || user?.email?.split('@')[0] || "Admin",
     });
 
     setNewContent({
@@ -48,12 +48,11 @@ const AdminControls: React.FC<AdminControlsProps> = ({ contentType, onAddContent
       type: contentType,
       content: "",
       date: new Date().toISOString(),
-      authorId: currentUser?.id || "",
-      authorName: currentUser?.name || "",
+      authorId: user?.id || "",
+      authorName: profile?.full_name || user?.email?.split('@')[0] || "Admin",
     });
 
     setIsDialogOpen(false);
-    toast.success("Content added successfully");
   };
 
   const getDialogTitle = () => {

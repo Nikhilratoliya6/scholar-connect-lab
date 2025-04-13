@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
+import { SupabaseAuthProvider, useSupabaseAuth } from "@/context/SupabaseAuthContext";
 import { AnimatePresence } from "framer-motion";
 
 // Layout Components
@@ -27,23 +27,35 @@ import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 
 // Protected Route Component
-import { useAuth } from "@/context/AuthContext";
-
-const queryClient = new QueryClient();
-
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { currentUser, isLoading } = useAuth();
+  const { user, isLoading } = useSupabaseAuth();
   
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
   
-  if (!currentUser) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
   
   return <>{children}</>;
 };
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAdmin, isLoading } = useSupabaseAuth();
+  
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  
+  if (!isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   return (
@@ -61,7 +73,9 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Dashboard />
+          <AdminRoute>
+            <Dashboard />
+          </AdminRoute>
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />
@@ -69,25 +83,29 @@ const AppRoutes = () => {
   );
 };
 
+const AppWithProviders = () => (
+  <BrowserRouter>
+    <SupabaseAuthProvider>
+      <TooltipProvider>
+        <div className="flex flex-col min-h-screen">
+          <Navbar />
+          <main className="flex-1 pt-16">
+            <AnimatePresence mode="wait">
+              <AppRoutes />
+            </AnimatePresence>
+          </main>
+          <Footer />
+        </div>
+        <Toaster />
+        <Sonner />
+      </TooltipProvider>
+    </SupabaseAuthProvider>
+  </BrowserRouter>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1 pt-16">
-              <AnimatePresence mode="wait">
-                <AppRoutes />
-              </AnimatePresence>
-            </main>
-            <Footer />
-          </div>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <AppWithProviders />
   </QueryClientProvider>
 );
 
