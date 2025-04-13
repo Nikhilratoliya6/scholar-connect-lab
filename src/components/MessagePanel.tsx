@@ -1,12 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Send, User } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useSupabaseAuth } from "@/context/SupabaseAuthContext";
 
 interface Message {
   id: string;
@@ -18,7 +18,7 @@ interface Message {
 }
 
 export const MessagePanel: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -37,17 +37,17 @@ export const MessagePanel: React.FC = () => {
     const newMessage: Message = {
       id: Date.now().toString(),
       content: message,
-      senderId: currentUser?.id || "unknown",
-      senderName: currentUser?.name || "Unknown User",
+      senderId: user?.id || "unknown",
+      senderName: profile?.full_name || user?.email?.split('@')[0] || "Unknown User",
       timestamp: new Date().toISOString(),
-      isAdmin: currentUser?.role === "admin",
+      isAdmin: profile?.role === "admin",
     };
     
     setMessages([...messages, newMessage]);
     setMessage("");
     
-    // Auto-reply if the user is a student
-    if (currentUser?.role === "student") {
+    // Auto-reply if the user is not an admin
+    if (profile?.role !== "admin") {
       setTimeout(() => {
         const replyMessage: Message = {
           id: (Date.now() + 1).toString(),

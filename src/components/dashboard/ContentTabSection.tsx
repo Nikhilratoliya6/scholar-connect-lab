@@ -25,16 +25,22 @@ const ContentTabSection: React.FC<ContentTabSectionProps> = ({
   return (
     <div className="space-y-6">
       {isAdmin && <AdminControls contentType={contentType} onAddContent={onAddContent} />}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredContent.map((item) => (
-          <ContentCard
-            key={item.id}
-            item={item}
-            onEdit={onEditContent}
-            onDelete={onDeleteContent}
-          />
-        ))}
-      </div>
+      {filteredContent.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No {contentType}s found. {isAdmin && "Add one to get started."}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredContent.map((item) => (
+            <ContentCard
+              key={item.id}
+              item={item}
+              onEdit={onEditContent}
+              onDelete={onDeleteContent}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

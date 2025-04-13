@@ -13,6 +13,25 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ content }) => {
     return content.filter(item => item.type === type);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  const getRecentUpdates = () => {
+    // Sort content by date (newest first) and take the first 3
+    const sortedContent = [...content].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    return sortedContent.slice(0, 3).map(item => ({
+      message: `New ${item.type} added: ${item.title}`,
+      date: item.date
+    }));
+  };
+
+  const recentUpdates = getRecentUpdates();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card>
@@ -23,18 +42,18 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ content }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="border-l-2 border-lab-primary pl-4 py-2">
-              <p className="text-sm font-medium">New publication added</p>
-              <p className="text-xs text-muted-foreground">2 days ago</p>
-            </div>
-            <div className="border-l-2 border-lab-primary pl-4 py-2">
-              <p className="text-sm font-medium">Course materials updated</p>
-              <p className="text-xs text-muted-foreground">5 days ago</p>
-            </div>
-            <div className="border-l-2 border-lab-primary pl-4 py-2">
-              <p className="text-sm font-medium">New event scheduled</p>
-              <p className="text-xs text-muted-foreground">1 week ago</p>
-            </div>
+            {recentUpdates.length > 0 ? (
+              recentUpdates.map((update, index) => (
+                <div key={index} className="border-l-2 border-lab-primary pl-4 py-2">
+                  <p className="text-sm font-medium">{update.message}</p>
+                  <p className="text-xs text-muted-foreground">{formatDate(update.date)}</p>
+                </div>
+              ))
+            ) : (
+              <div className="border-l-2 border-lab-primary pl-4 py-2">
+                <p className="text-sm">No recent updates</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -47,14 +66,20 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ content }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredContent("event").slice(0, 3).map((event) => (
-              <div key={event.id} className="border-l-2 border-lab-primary pl-4 py-2">
-                <p className="text-sm font-medium">{event.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(event.date).toLocaleDateString()}
-                </p>
+            {filteredContent("event").slice(0, 3).length > 0 ? (
+              filteredContent("event").slice(0, 3).map((event) => (
+                <div key={event.id} className="border-l-2 border-lab-primary pl-4 py-2">
+                  <p className="text-sm font-medium">{event.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(event.date)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="border-l-2 border-lab-primary pl-4 py-2">
+                <p className="text-sm">No upcoming events</p>
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>
@@ -67,14 +92,20 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ content }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {content.slice(0, 3).map((item) => (
-              <div key={item.id} className="border-l-2 border-lab-primary pl-4 py-2">
-                <p className="text-sm font-medium">{item.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {item.type} • {new Date(item.date).toLocaleDateString()}
-                </p>
+            {content.slice(0, 3).length > 0 ? (
+              content.slice(0, 3).map((item) => (
+                <div key={item.id} className="border-l-2 border-lab-primary pl-4 py-2">
+                  <p className="text-sm font-medium">{item.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.type} • {formatDate(item.date)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="border-l-2 border-lab-primary pl-4 py-2">
+                <p className="text-sm">No recent content</p>
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>
